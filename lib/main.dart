@@ -2,29 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lab_3/bloc/cart_bloc.dart';
 import 'package:lab_3/models/product.dart';
+import 'package:lab_3/interface.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiBlocProvider(
+      providers: [
+        BlocProvider<CartBloc>(
+          create: (context) => CartBloc(),
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MultiBlocProvider(
-        providers: [
-          BlocProvider<CartBloc>(
-            create: (BuildContext context) => CartBloc(),
-          ),
-        ],
-        child: MyHomePage(),
-      ),
+      home: MyHomePage(),
     );
   }
 }
@@ -36,7 +40,7 @@ class MyHomePage extends StatelessWidget {
     Product(id: 3, name: "Product 3", price: 30),
   ];
 
-   MyHomePage({super.key});
+  MyHomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -55,12 +59,11 @@ class MyHomePage extends StatelessWidget {
               onPressed: () {
                 try {
                   BlocProvider.of<CartBloc>(context)
-                    .add(AddToCart(CartItem(product: products[index])));
-                    print(products[index].name + " added to cart");
+                      .add(AddToCart(CartItem(product: products[index])));
+                  print(products[index].name + " added to cart");
                 } catch (e) {
                   print(e.toString());
                 }
-                
               },
             ),
           );
@@ -73,14 +76,14 @@ class MyHomePage extends StatelessWidget {
             MaterialPageRoute(builder: (context) => const CartPage()),
           );
         },
-        child:const Icon(Icons.shopping_cart),
+        child: const Icon(Icons.shopping_cart),
       ),
     );
   }
 }
 
 class CartPage extends StatelessWidget {
-  const CartPage({super.key});
+  const CartPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

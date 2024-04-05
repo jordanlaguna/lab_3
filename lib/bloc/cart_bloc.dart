@@ -5,6 +5,7 @@ import 'package:lab_3/models/product.dart';
 class CartBloc extends Bloc<CartEvent, List<CartItem>> {
   CartBloc() : super([]);
 
+  @override
   Stream<List<CartItem>> mapEventToState(CartEvent event) async* {
     if (event is AddToCart) {
       yield* _mapAddToCartToState(event);
@@ -14,20 +15,22 @@ class CartBloc extends Bloc<CartEvent, List<CartItem>> {
   }
 
   Stream<List<CartItem>> _mapAddToCartToState(AddToCart event) async* {
-    state.add(event.item);
-    yield List.from(state);
+    // Crear una nueva lista con el nuevo elemento agregado
+    List<CartItem> updatedCart = List.from(state)..add(event.item);
+    // Emitir la nueva lista como el nuevo estado
+    yield updatedCart;
   }
 
   Stream<List<CartItem>> _mapRemoveFromCartToState(
       RemoveFromCart event) async* {
-    state.remove(event.item);
-    yield List.from(state);
+    // Crear una nueva lista sin el elemento que se va a eliminar
+    List<CartItem> updatedCart = List.from(state)..remove(event.item);
+    // Emitir la nueva lista como el nuevo estado
+    yield updatedCart;
   }
 }
 
-abstract class CartEvent {
-  
-}
+abstract class CartEvent {}
 
 class AddToCart extends CartEvent {
   final CartItem item;
