@@ -1,8 +1,9 @@
+// ignore_for_file: avoid_print, prefer_interpolation_to_compose_strings
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lab_3/bloc/cart_bloc.dart';
 import 'package:lab_3/models/product.dart';
-import 'package:lab_3/interface.dart';
 
 void main() {
   runApp(
@@ -35,9 +36,12 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatelessWidget {
   final List<Product> products = [
-    Product(id: 1, name: "Product 1", price: 10),
-    Product(id: 2, name: "Product 2", price: 20),
-    Product(id: 3, name: "Product 3", price: 30),
+    Product(id: 1, name: "Coca-cola", price: 10),
+    Product(id: 2, name: "Hamburguesa", price: 20),
+    Product(id: 3, name: "Pizza", price: 30),
+    Product(id: 4, name: "Hot Dog", price: 15),
+    Product(id: 5, name: "Pasrel", price: 20),
+    Product(id: 6, name: "Fanta Naranja", price: 30),
   ];
 
   MyHomePage({Key? key}) : super(key: key);

@@ -16,8 +16,6 @@ class PageCart extends StatelessWidget {
         builder: (context, cartItems) {
           int totalItems = 0;
           double totalPrice = 0.0;
-
-          // Calcular el número total de productos y el precio total
           for (var item in cartItems) {
             totalItems += item.quantity;
             totalPrice += item.product.price * item.quantity;
@@ -30,14 +28,14 @@ class PageCart extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: Text(
                   'Total de productos en el carrito: $totalItems',
-                  style: TextStyle(fontSize: 18),
+                  style: const TextStyle(fontSize: 18),
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Text(
                   'Precio total: \$${totalPrice.toStringAsFixed(2)}',
-                  style: TextStyle(fontSize: 18),
+                  style: const TextStyle(fontSize: 18),
                 ),
               ),
               Expanded(
