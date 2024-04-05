@@ -1,121 +1,114 @@
-// ignore_for_file: override_on_non_overriding_member
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lab_3/bloc/cart_bloc.dart';
+import 'package:lab_3/models/product.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
+      title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        primarySwatch: Colors.blue,
       ),
-      home: BlocProvider(
-        create: (context) => ShoppingCartBloc(),
-        child: const ShoppingCartPage(),
+      home: MultiBlocProvider(
+        providers: [
+          BlocProvider<CartBloc>(
+            create: (BuildContext context) => CartBloc(),
+          ),
+        ],
+        child: MyHomePage(),
       ),
     );
   }
 }
 
-class ShoppingCartPage extends StatelessWidget {
-  const ShoppingCartPage({Key? key}) : super(key: key);
+class MyHomePage extends StatelessWidget {
+  final List<Product> products = [
+    Product(id: 1, name: "Product 1", price: 10),
+    Product(id: 2, name: "Product 2", price: 20),
+    Product(id: 3, name: "Product 3", price: 30),
+  ];
+
+   MyHomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Shopping Cart'),
+        title: const Text('Productos'),
       ),
-      body: BlocBuilder<ShoppingCartBloc, ShoppingCartState>(
-        builder: (context, state) {
-          if (state is ShoppingCartLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (state is ShoppingCartLoaded) {
-            return ListView.builder(
-              itemCount: state.items.length,
-              itemBuilder: (context, index) {
-                final item = state.items[index];
-                return ListTile(
-                  title: Text(item.name),
-                  subtitle: Text('\$${item.price.toStringAsFixed(2)}'),
-                );
+      body: ListView.builder(
+        itemCount: products.length,
+        itemBuilder: (BuildContext context, int index) {
+          return ListTile(
+            title: Text(products[index].name),
+            subtitle: Text('\$${products[index].price}'),
+            trailing: IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () {
+                try {
+                  BlocProvider.of<CartBloc>(context)
+                    .add(AddToCart(CartItem(product: products[index])));
+                    print(products[index].name + " added to cart");
+                } catch (e) {
+                  print(e.toString());
+                }
+                
               },
-            );
-          } else if (state is ShoppingCartError) {
-            return Center(
-              child: Text(state.message),
-            );
-          } else {
-            return const Center(
-              child: Text('Unknown state'),
-            );
-          }
+            ),
+          );
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const CartPage()),
+          );
+        },
+        child:const Icon(Icons.shopping_cart),
       ),
     );
   }
 }
 
-class ShoppingCartBloc extends Bloc<ShoppingCartEvent, ShoppingCartState> {
-  ShoppingCartBloc() : super(ShoppingCartLoading());
+class CartPage extends StatelessWidget {
+  const CartPage({super.key});
 
   @override
-  Stream<ShoppingCartState> mapEventToState(ShoppingCartEvent event) async* {
-    if (event is LoadShoppingCartItems) {
-      yield* _mapLoadShoppingCartItemsToState();
-    }
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Carrito de compras'),
+      ),
+      body: BlocBuilder<CartBloc, List<CartItem>>(
+        builder: (context, cartItems) {
+          return ListView.builder(
+            itemCount: cartItems.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                title: Text(cartItems[index].product.name),
+                subtitle:
+                    Text('\$${cartItems[index].product.price.toString()}'),
+                trailing: IconButton(
+                  icon: const Icon(Icons.remove),
+                  onPressed: () {
+                    BlocProvider.of<CartBloc>(context)
+                        .add(RemoveFromCart(cartItems[index]));
+                  },
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
   }
-
-  Stream<ShoppingCartState> _mapLoadShoppingCartItemsToState() async* {
-    try {
-      // Simulate an API call to fetch shopping cart items
-      await Future.delayed(const Duration(seconds: 2));
-      final items = [
-        ShoppingCartItem(name: 'Item 1', price: 10.0),
-        ShoppingCartItem(name: 'Item 2', price: 20.0),
-        ShoppingCartItem(name: 'Item 3', price: 30.0),
-      ];
-      yield ShoppingCartLoaded(items: items);
-    } catch (e) {
-      yield ShoppingCartError(message: 'Failed to load shopping cart items');
-    }
-  }
-}
-
-abstract class ShoppingCartEvent {}
-
-class LoadShoppingCartItems extends ShoppingCartEvent {}
-
-abstract class ShoppingCartState {}
-
-class ShoppingCartLoading extends ShoppingCartState {}
-
-class ShoppingCartLoaded extends ShoppingCartState {
-  final List<ShoppingCartItem> items;
-
-  ShoppingCartLoaded({required this.items});
-}
-
-class ShoppingCartError extends ShoppingCartState {
-  final String message;
-
-  ShoppingCartError({required this.message});
-}
-
-class ShoppingCartItem {
-  final String name;
-  final double price;
-
-  ShoppingCartItem({required this.name, required this.price});
 }
